@@ -2,18 +2,16 @@
 #define STRINGCALCULATOR_H
 
 #include <string>
-#include <cctype>
-#include <iostream>
+#include <vector>
+#include <stdexcept>
 
 class StringCalculator
 {
-  public:
-    int check_for_less_than_thousand(int num);
-    int get_positive_number(int num);
-
-    std::string Process_String_for_delimiters(std::string input);
-    int exception_handling_for_whitespce(std::string token);
-    int add(std::string input);  // Ensure this line is present
+public:
+    int checkIfLessThanThousand(int num);
+    int validateNonNegative(int num);
+    std::string adjustDelimiters(std::string input);
+    int handleWhitespace(std::string token);
+    int add(std::string input);  // Function name should be `add`
 };
-
 #endif // STRINGCALCULATOR_H
