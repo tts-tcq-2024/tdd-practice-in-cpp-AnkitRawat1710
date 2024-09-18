@@ -1,86 +1,55 @@
 #include "StringCalculator.h"
 #include <sstream>
 #include <stdexcept>
-#include <algorithm>
+#include <regex>
 
-// Utility function to split a string by a specified delimiter
-std::vector<std::string> StringCalculator::splitString(const std::string& input, const std::string& delimiter) {
-    std::vector<std::string> tokens;
-    size_t start = 0;
-    size_t end = input.find(delimiter);
-    
-    while (end != std::string::npos) {
-        tokens.push_back(input.substr(start, end - start));
-        start = end + delimiter.length();
-        end = input.find(delimiter, start);
+// Helper method to extract delimiter; default is ",|\n"
+std::string StringCalculator::extractDelimiter(const std::string& input) {
+    if (input.rfind("//", 0) == 0) {
+        size_t newlinePos = input.find('\n');
+        return input.substr(2, newlinePos - 2);  // Extract custom delimiter
     }
-    tokens.push_back(input.substr(start));
-    return tokens;
+    return ",|\n";  // Default delimiters
 }
 
-// Helper function to extract custom delimiter if specified in the format "//[delimiter]\n"
-std::string StringCalculator::getDelimiter(const std::string& numbers) {
-    if (numbers.substr(0, 2) == "//") {
-        size_t delimiterEnd = numbers.find('\n');
-        return numbers.substr(2, delimiterEnd - 2);
-    }
-    return ",|\n";  // Default delimiter is either comma or newline
-}
+// Helper method to parse numbers and handle exceptions
+std::vector<int> StringCalculator::parseNumbers(const std::string& input) {
+    std::string delimiter = extractDelimiter(input);
+    std::string numbersPart = input.rfind("//", 0) == 0 ? input.substr(input.find('\n') + 1) : input;
 
-// Helper function to get the section containing the actual numbers to be processed
-std::string StringCalculator::getNumberSection(const std::string& numbers) {
-    if (numbers.substr(0, 2) == "//") {
-        size_t delimiterEnd = numbers.find('\n');
-        return numbers.substr(delimiterEnd + 1);
-    }
-    return numbers;
-}
+    std::regex delimiterRegex(delimiter);
+    std::sregex_token_iterator iter(numbersPart.begin(), numbersPart.end(), delimiterRegex, -1);
+    std::sregex_token_iterator end;
 
-// Helper function to parse and convert string numbers into integers, handles exceptions
-std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, const std::string& delimiter) {
-    std::vector<std::string> tokens = splitString(numbers, delimiter);
-    std::vector<int> numList;
+    std::vector<int> numbers;
     std::vector<int> negatives;
 
-    for (const std::string& token : tokens) {
-        if (!token.empty()) {
-            int num = std::stoi(token);
+    for (; iter != end; ++iter) {
+        if (!iter->str().empty()) {
+            int num = std::stoi(iter->str());
             if (num < 0) {
                 negatives.push_back(num);
             } else if (num <= 1000) {
-                numList.push_back(num);
+                numbers.push_back(num);
             }
         }
     }
 
-    // Throw exception if negative numbers are found
     if (!negatives.empty()) {
-        std::string errorMsg = "Negatives not allowed: ";
-        for (int neg : negatives) {
-            errorMsg += std::to_string(neg) + " ";
-        }
-        throw std::runtime_error(errorMsg);
+        throw std::runtime_error("Negatives not allowed: " + std::accumulate(negatives.begin(), negatives.end(), std::string(), 
+                         [](const std::string& acc, int n) { return acc + (acc.empty() ? "" : ",") + std::to_string(n); }));
     }
 
-    return numList;
+    return numbers;
 }
 
-// Main 'add' method implementation
-int StringCalculator::add(const std::string& numbers) {
-    if (numbers.empty()) {
-        return 0;
-    }
+// Main method to add numbers
+int StringCalculator::add(const std::string& input) {
+    if (input.empty()) return 0;
 
-    std::string delimiter = getDelimiter(numbers);
-    std::string numSection = getNumberSection(numbers);
-    std::vector<int> numList = parseNumbers(numSection, delimiter);
-
+    std::vector<int> numbers = parseNumbers(input);
     int sum = 0;
-    for (int num : numList) {
-        sum += num;
-    }
+    for (int num : numbers) sum += num;
 
     return sum;
 }
-
-
