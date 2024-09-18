@@ -1,17 +1,17 @@
-#ifndef STRINGCALCULATOR_H
-#define STRINGCALCULATOR_H
+#ifndef STRING_CALCULATOR_H
+#define STRING_CALCULATOR_H
 
 #include <string>
-#include <cctype>
-#include <iostream>
+#include <vector>
 
 class StringCalculator
 {
-  public:
-    int check_for_less_than_thousand(int num);
-    int get_positive_number(int num);
-    std::string Process_String_for_delimiters(std::string input);
-    int exception_handling_for_whitespce(std::string token);
-    int add(std::string input);
+public:
+    int validateNumberRange(int number);
+    int ensurePositive(int number);
+    std::string formatStringForDelimiters(const std::string& input);
+    int handleWhitespaceErrors(const std::string& token);
+    int computeSum(const std::string& input);
 };
-#endif // StringCalculator_H
+
+#endif // STRING_CALCULATOR_H
