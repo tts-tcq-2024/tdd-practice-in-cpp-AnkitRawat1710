@@ -1,75 +1,98 @@
 #include "StringCalculator.h"
 #include <sstream>
+#include <iostream>
+#include <cctype>
 #include <algorithm>
-#include <iterator>
+#include <vector>
+#include <stdexcept>
+#include <string>
 
-// Define the add method
-int StringCalculator::add(const std::string& input) {
-    if (input.empty()) return 0;
+std::vector<int> negatives;
+int flag = 0;
 
-    std::string delimiter = extractDelimiter(input);
-    std::vector<std::string> tokens = splitNumbers(input, delimiter);
-    std::vector<int> numbers = parseTokens(tokens);
-
-    std::vector<int> negatives = collectNegatives(numbers);
-    handleNegatives(negatives);
-
-    return std::accumulate(numbers.begin(), numbers.end(), 0);
-}
-
-std::vector<int> StringCalculator::parseTokens(const std::vector<std::string>& tokens) {
-    std::vector<int> numbers;
-    for (const std::string& token : tokens) {
-        int number = std::stoi(token);
-        if (number < 0) {
-            throw std::runtime_error("Negatives not allowed: " + std::to_string(number));
+class Exception : public std::runtime_error {
+public:
+    Exception(const std::string& message)
+        : std::runtime_error(message) {}
+};
+void alphabet_error(std::string token)
+{
+    for(char ch : token)
+        if(isalpha(ch))
+        {
+            std::string message = "Alphabets not allowed: ";
+            throw Exception(message);
         }
-        numbers.push_back(number);
+}
+void throw_error()
+{
+        std::string message = "Negatives not allowed: ";
+        for (int i = 0; i < negatives.size(); ++i) 
+            {
+                message += std::to_string(negatives[i]);
+                if (i < negatives.size() - 1) 
+                {
+                    message += ", ";
+                }
+            }
+        throw Exception(message);
+}
+int StringCalculator::check_for_less_than_thousand(int num)
+    {
+       if (num>=1000)
+         return 0;
+      else
+         return num;
     }
-    return numbers;
-}
-
-void StringCalculator::handleNegatives(const std::vector<int>& negatives) {
-    if (negatives.empty()) return;
-
-    std::string errorMessage = buildErrorMessage(negatives);
-    throw std::runtime_error(errorMessage);
-}
-
-std::string StringCalculator::buildErrorMessage(const std::vector<int>& negatives) {
-    std::string errorMessage = "Negatives not allowed: ";
-    for (int num : negatives) {
-        errorMessage += std::to_string(num) + " ";
+int StringCalculator::get_positive_number(int num)
+{
+    int digit = 0;
+    if(num>=0)
+        digit = check_for_less_than_thousand(num);
+    else
+    {
+        negatives.push_back(num);
+        flag++;
     }
-    return errorMessage;
+    return digit;
 }
 
-std::vector<int> StringCalculator::collectNegatives(const std::vector<int>& numbers) {
-    std::vector<int> negatives;
-    std::copy_if(numbers.begin(), numbers.end(), std::back_inserter(negatives),
-                 [](int number) { return number < 0; });
-    return negatives;
+std::string StringCalculator::Process_String_for_delimiters(std::string input)
+{
+      if (input.substr(0, 2) == "//") 
+     {
+        char delimiter = input[2];  
+        input = input.substr(4);
+        std::replace(input.begin(), input.end(), delimiter, ',');
+     }
+      std::replace(input.begin(), input.end(), '\n', ',');
+    return input;
 }
 
-std::string StringCalculator::extractDelimiter(const std::string& numbers) {
-    // Extract delimiter logic
-    // Dummy implementation
-    return ",";
+int StringCalculator::exception_handling_for_whitespce(std::string token)
+{
+    if (!token.empty()) 
+    {  // Check if the token is not empty
+        alphabet_error(token);  
+        int num = std::stoi(token);  // Convert to integer
+        return num;
+    } 
+    return 0;
 }
-
-std::vector<std::string> StringCalculator::splitNumbers(const std::string& input, const std::string& delimiter) {
-    // Split numbers logic
-    // Dummy implementation
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(input);
-    while (std::getline(tokenStream, token, delimiter[0])) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
-
-void StringCalculator::checkForNegatives(const std::vector<int>& numbers) {
-    // Check for negatives logic
-    // Dummy implementation
-}
+    
+int StringCalculator::add(std::string input)
+   { 
+      std::string processed_input = Process_String_for_delimiters(input);
+      int sum = 0;
+      std::stringstream ss(processed_input);
+      std::string token;  
+      while(std::getline(ss,token,','))
+      {
+          int num = exception_handling_for_whitespce(token);
+          int addition = get_positive_number(num);
+          sum += addition;
+      }
+       if(flag>0)
+          throw_error();
+      return sum;
+   }
