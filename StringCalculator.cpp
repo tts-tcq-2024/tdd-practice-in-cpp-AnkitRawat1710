@@ -2,6 +2,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <regex>
+#include <numeric>  // Add this line for std::accumulate
 
 // Helper method to extract delimiter; default is ",|\n"
 std::string StringCalculator::extractDelimiter(const std::string& input) {
@@ -36,7 +37,7 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& input) {
     }
 
     if (!negatives.empty()) {
-        throw std::runtime_error("Negatives not allowed: " + std::accumulate(negatives.begin(), negatives.end(), std::string(), 
+        throw std::runtime_error("Negatives not allowed: " + std::accumulate(negatives.begin(), negatives.end(), std::string(),
                          [](const std::string& acc, int n) { return acc + (acc.empty() ? "" : ",") + std::to_string(n); }));
     }
 
