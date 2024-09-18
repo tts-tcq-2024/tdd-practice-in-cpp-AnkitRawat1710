@@ -6,6 +6,7 @@
 
 class StringCalculator {
 public:
+    int add(const std::string& input);
     std::vector<int> parseNumbers(const std::string& numbers);
     void handleNegatives(const std::vector<int>& negatives);
     std::vector<int> collectNegatives(const std::vector<int>& numbers);
