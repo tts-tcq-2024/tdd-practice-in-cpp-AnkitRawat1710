@@ -2,7 +2,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <regex>
-#include <numeric> // Needed for std::accumulate
+#include <numeric>
 
 // Helper method to extract delimiter; default is ",|\n"
 std::string StringCalculator::extractDelimiter(const std::string& input) {
@@ -21,15 +21,19 @@ std::vector<std::string> StringCalculator::splitNumbers(const std::string& input
     return {iter, end};
 }
 
-// Helper method to handle negative numbers
-void StringCalculator::checkForNegatives(const std::vector<int>& numbers) {
+// Helper method to collect negative numbers
+std::vector<int> StringCalculator::collectNegatives(const std::vector<int>& numbers) {
     std::vector<int> negatives;
     for (int num : numbers) {
         if (num < 0) {
             negatives.push_back(num);
         }
     }
+    return negatives;
+}
 
+// Helper method to throw exception if negatives are found
+void StringCalculator::handleNegatives(const std::vector<int>& negatives) {
     if (!negatives.empty()) {
         throw std::runtime_error("Negatives not allowed: " +
             std::accumulate(negatives.begin(), negatives.end(), std::string(),
@@ -56,7 +60,9 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& input) {
         }
     }
 
-    checkForNegatives(numbers);
+    std::vector<int> negatives = collectNegatives(numbers);
+    handleNegatives(negatives);
+
     return numbers;
 }
 
