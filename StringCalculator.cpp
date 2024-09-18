@@ -23,16 +23,18 @@ namespace {
     }
 
     void validateNegatives() {
-        if (hasNegatives) {
-            std::string message = "Negatives are not allowed: ";
-            for (size_t i = 0; i < negativeNumbers.size(); ++i) {
-                message += std::to_string(negativeNumbers[i]);
-                if (i < negativeNumbers.size() - 1) {
-                    message += ", ";
-                }
-            }
-            throw CustomException(message);
+        if (negativeNumbers.empty()) {
+            return;
         }
+
+        std::string message = "Negatives are not allowed: ";
+        for (size_t i = 0; i < negativeNumbers.size(); ++i) {
+            if (i > 0) {
+                message += ", ";
+            }
+            message += std::to_string(negativeNumbers[i]);
+        }
+        throw CustomException(message);
     }
 }
 
@@ -43,7 +45,6 @@ int StringCalculator::checkIfLessThanThousand(int num) {
 int StringCalculator::validateNonNegative(int num) {
     if (num < 0) {
         negativeNumbers.push_back(num);
-        hasNegatives = true;
         return 0;
     }
     return checkIfLessThanThousand(num);
