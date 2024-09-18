@@ -1,5 +1,5 @@
-#ifndef STRINGCALCULATOR_H
-#define STRINGCALCULATOR_H
+#ifndef STRING_CALCULATOR_H
+#define STRING_CALCULATOR_H
 
 #include <string>
 #include <vector>
@@ -10,9 +10,12 @@ public:
 
 private:
     std::string extractDelimiter(const std::string& input);
-    std::vector<std::string> splitNumbers(const std::string& input, const std::string& delimiter); // New method declaration
-    void checkForNegatives(const std::vector<int>& numbers); // New method declaration
+    std::vector<std::string> splitNumbers(const std::string& input, const std::string& delimiter);
     std::vector<int> parseNumbers(const std::string& input);
+    
+    // New helper methods
+    std::vector<int> collectNegatives(const std::vector<int>& numbers);
+    void handleNegatives(const std::vector<int>& negatives);
 };
 
-#endif // STRINGCALCULATOR_H
+#endif // STRING_CALCULATOR_H
