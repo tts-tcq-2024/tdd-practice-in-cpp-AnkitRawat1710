@@ -1,97 +1,94 @@
 #include "StringCalculator.h"
 #include <sstream>
-#include <iostream>
-#include <cctype>
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
-#include <string>
+#include <cctype>
 
-// Global variables for error handling
 std::vector<int> negativeNumbers;
-int negativeCount = 0;
+int negativeFlag = 0;
 
-// Custom exception class
-class CustomException : public std::runtime_error {
+class CalculationException : public std::runtime_error {
 public:
-    CustomException(const std::string& message)
+    CalculationException(const std::string& message)
         : std::runtime_error(message) {}
 };
 
-// Check for alphabetical characters in the token
-void validateForAlphabets(const std::string& token) {
-    for(char ch : token) {
-        if(std::isalpha(ch)) {
-            std::string message = "Alphabetic characters are not permitted: ";
-            throw CustomException(message);
+void checkForAlphabets(const std::string& token)
+{
+    for(char ch : token)
+        if(std::isalpha(ch))
+        {
+            throw CalculationException("Alphabets are not allowed: " + token);
         }
-    }
 }
 
-// Handle negative numbers and throw an exception
-void handleNegativeNumbers() {
-    std::string message = "Negative numbers are not allowed: ";
-    for (size_t i = 0; i < negativeNumbers.size(); ++i) {
+void handleNegativeNumbers()
+{
+    std::string message = "Negative numbers not permitted: ";
+    for (size_t i = 0; i < negativeNumbers.size(); ++i) 
+    {
         message += std::to_string(negativeNumbers[i]);
-        if (i < negativeNumbers.size() - 1) {
+        if (i < negativeNumbers.size() - 1) 
+        {
             message += ", ";
         }
     }
-    throw CustomException(message);
+    throw CalculationException(message);
 }
 
-// Validate if the number is below a certain threshold
-int StringCalculator::validateNumberThreshold(int number) {
+int StringCalculator::limitToMaxValue(int number)
+{
     return (number >= 1000) ? 0 : number;
 }
 
-// Ensure the number is positive and process negative numbers
-int StringCalculator::processPositiveNumber(int number) {
-    if (number >= 0) {
-        return validateNumberThreshold(number);
-    } else {
+int StringCalculator::processNumber(int number)
+{
+    if (number >= 0)
+        return limitToMaxValue(number);
+    else
+    {
         negativeNumbers.push_back(number);
-        negativeCount++;
+        negativeFlag++;
         return 0;
     }
 }
 
-// Format input string by replacing delimiters
-std::string StringCalculator::formatStringForDelimiters(const std::string& input) {
-    std::string formattedInput = input;
-    if (formattedInput.substr(0, 2) == "//") {
-        char delimiter = formattedInput[2];
-        formattedInput = formattedInput.substr(4);
-        std::replace(formattedInput.begin(), formattedInput.end(), delimiter, ',');
+std::string StringCalculator::adjustStringDelimiters(const std::string& input)
+{
+    std::string modifiedInput = input;
+    if (input.substr(0, 2) == "//") 
+    {
+        char customDelimiter = input[2];
+        modifiedInput = input.substr(4);
+        std::replace(modifiedInput.begin(), modifiedInput.end(), customDelimiter, ',');
     }
-    std::replace(formattedInput.begin(), formattedInput.end(), '\n', ',');
-    return formattedInput;
+    std::replace(modifiedInput.begin(), modifiedInput.end(), '\n', ',');
+    return modifiedInput;
 }
 
-// Handle whitespace and conversion errors
-int StringCalculator::convertTokenToNumber(const std::string& token) {
-    if (!token.empty()) {
-        validateForAlphabets(token);
+int StringCalculator::handleTokenConversion(const std::string& token)
+{
+    if (!token.empty()) 
+    {
+        checkForAlphabets(token);
         return std::stoi(token);
     }
     return 0;
 }
 
-// Compute the sum of numbers in the input string
-int StringCalculator::computeSum(const std::string& input) {
-    std::string formattedInput = formatStringForDelimiters(input);
+int StringCalculator::computeSumFromString(const std::string& input)
+{
+    std::string adjustedInput = adjustStringDelimiters(input);
     int totalSum = 0;
-    std::stringstream ss(formattedInput);
+    std::stringstream ss(adjustedInput);
     std::string token;
-
-    while (std::getline(ss, token, ',')) {
-        int number = convertTokenToNumber(token);
-        totalSum += processPositiveNumber(number);
+    while (std::getline(ss, token, ','))
+    {
+        int number = handleTokenConversion(token);
+        totalSum += processNumber(number);
     }
-
-    if (negativeCount > 0) {
+    if (negativeFlag > 0)
         handleNegativeNumbers();
-    }
-
     return totalSum;
 }
