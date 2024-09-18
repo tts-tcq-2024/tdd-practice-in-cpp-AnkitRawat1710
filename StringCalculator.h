@@ -2,24 +2,18 @@
 #define STRINGCALCULATOR_H
 
 #include <string>
+#include <cctype>
+#include <iostream>
 
-class StringCalculator {
-public:
-    // Method to compute the sum from the input string
-    int computeSumFromString(const std::string& input);
+class StringCalculator
+{
+  public:
+    int check_for_less_than_thousand(int num);
+    int get_positive_number(int num);
 
-private:
-    // Helper method to check if a number is below 1000
-    int limitToThousand(int num);
-
-    // Helper method to process the input string for delimiters
-    std::string replaceDelimiters(std::string input);
-
-    // Helper method to handle whitespace and convert to integer
-    int handleWhitespaceAndConvert(const std::string& token);
-
-    // Helper method to handle negative numbers and throw exceptions
-    void validateNoNegatives();
+    std::string Process_String_for_delimiters(std::string input);
+    int exception_handling_for_whitespce(std::string token);
+    int add(std::string input);  // Ensure this line is present
 };
 
 #endif // STRINGCALCULATOR_H
