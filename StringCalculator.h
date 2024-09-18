@@ -6,6 +6,7 @@
 
 class StringCalculator {
 public:
+    // Public method to add numbers from the input string
     int add(const std::string& input);
 
 private:
