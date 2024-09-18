@@ -1,17 +1,25 @@
-#ifndef STRING_CALCULATOR_H
-#define STRING_CALCULATOR_H
+#ifndef STRINGCALCULATOR_H
+#define STRINGCALCULATOR_H
 
 #include <string>
-#include <vector>
 
 class StringCalculator
 {
 public:
-    int validateNumberRange(int number);
-    int ensurePositive(int number);
+    // Method to validate if the number is below a certain threshold
+    int validateNumberThreshold(int number);
+
+    // Method to ensure the number is positive and process negative numbers
+    int processPositiveNumber(int number);
+
+    // Method to format the input string by replacing delimiters
     std::string formatStringForDelimiters(const std::string& input);
-    int handleWhitespaceErrors(const std::string& token);
+
+    // Method to handle whitespace and conversion errors
+    int convertTokenToNumber(const std::string& token);
+
+    // Method to compute the sum of numbers in the input string
     int computeSum(const std::string& input);
 };
 
-#endif // STRING_CALCULATOR_H
+#endif // STRINGCALCULATOR_H
