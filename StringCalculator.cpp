@@ -28,13 +28,19 @@ namespace {
         }
 
         std::string message = "Negatives are not allowed: ";
+        message += joinNegativeNumbers();
+        throw CustomException(message);
+    }
+
+    std::string joinNegativeNumbers() {
+        std::string result;
         for (size_t i = 0; i < negativeNumbers.size(); ++i) {
             if (i > 0) {
-                message += ", ";
+                result += ", ";
             }
-            message += std::to_string(negativeNumbers[i]);
+            result += std::to_string(negativeNumbers[i]);
         }
-        throw CustomException(message);
+        return result;
     }
 }
 
@@ -82,3 +88,4 @@ int StringCalculator::add(std::string input) {
     validateNegatives();
     return total;
 }
+
