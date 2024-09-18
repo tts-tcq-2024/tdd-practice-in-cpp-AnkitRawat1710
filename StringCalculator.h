@@ -1,22 +1,17 @@
-#ifndef STRING_CALCULATOR_H
-#define STRING_CALCULATOR_H
+#ifndef STRINGCALCULATOR_H
+#define STRINGCALCULATOR_H
 
-#include <vector>
 #include <string>
+#include <cctype>
+#include <iostream>
 
-class StringCalculator {
-public:
-    int add(const std::string& input);
-    std::vector<int> parseNumbers(const std::string& numbers);
-    void handleNegatives(const std::vector<int>& negatives);
-    std::vector<int> collectNegatives(const std::vector<int>& numbers);
-
-private:
-    std::string extractDelimiter(const std::string& numbers);
-    std::vector<std::string> splitNumbers(const std::string& input, const std::string& delimiter);
-    void checkForNegatives(const std::vector<int>& numbers);
-    std::vector<int> parseTokens(const std::vector<std::string>& tokens);
-    std::string buildErrorMessage(const std::vector<int>& negatives);
+class StringCalculator
+{
+  public:
+    int check_for_less_than_thousand(int num);
+    int get_positive_number(int num);
+    std::string Process_String_for_delimiters(std::string input);
+    int exception_handling_for_whitespce(std::string token);
+    int add(std::string input);
 };
-
-#endif // STRING_CALCULATOR_H
+#endif // StringCalculator_H
