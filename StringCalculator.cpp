@@ -3,92 +3,77 @@
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
-#include <cctype>
+#include <string>
 
-std::vector<int> negativeNumbers;
-int negativeFlag = 0;
-
+// Custom exception class for error handling
 class CalculationException : public std::runtime_error {
 public:
-    CalculationException(const std::string& message)
+    explicit CalculationException(const std::string& message)
         : std::runtime_error(message) {}
 };
 
-void checkForAlphabets(const std::string& token)
-{
-    for(char ch : token)
-        if(std::isalpha(ch))
-        {
-            throw CalculationException("Alphabets are not allowed: " + token);
-        }
-}
+// Global variables to track negative numbers
+std::vector<int> negativeNumbers;
+bool hasNegativeNumbers = false;
 
-void handleNegativeNumbers()
-{
-    std::string message = "Negative numbers not permitted: ";
-    for (size_t i = 0; i < negativeNumbers.size(); ++i) 
-    {
-        message += std::to_string(negativeNumbers[i]);
-        if (i < negativeNumbers.size() - 1) 
-        {
-            message += ", ";
+void detectAlphabetErrors(const std::string& token) {
+    for (char ch : token) {
+        if (isalpha(ch)) {
+            throw CalculationException("Alphabets not allowed: " + token);
         }
     }
-    throw CalculationException(message);
 }
 
-int StringCalculator::limitToMaxValue(int number)
-{
-    return (number >= 1000) ? 0 : number;
-}
-
-int StringCalculator::processNumber(int number)
-{
-    if (number >= 0)
-        return limitToMaxValue(number);
-    else
-    {
-        negativeNumbers.push_back(number);
-        negativeFlag++;
-        return 0;
+void validateNoNegatives() {
+    if (hasNegativeNumbers) {
+        std::string message = "Negatives not allowed: ";
+        for (size_t i = 0; i < negativeNumbers.size(); ++i) {
+            message += std::to_string(negativeNumbers[i]);
+            if (i < negativeNumbers.size() - 1) {
+                message += ", ";
+            }
+        }
+        throw CalculationException(message);
     }
 }
 
-std::string StringCalculator::adjustStringDelimiters(const std::string& input)
-{
-    std::string modifiedInput = input;
-    if (input.substr(0, 2) == "//") 
-    {
-        char customDelimiter = input[2];
-        modifiedInput = input.substr(4);
-        std::replace(modifiedInput.begin(), modifiedInput.end(), customDelimiter, ',');
-    }
-    std::replace(modifiedInput.begin(), modifiedInput.end(), '\n', ',');
-    return modifiedInput;
+int StringCalculator::limitToThousand(int num) {
+    return (num >= 1000) ? 0 : num;
 }
 
-int StringCalculator::handleTokenConversion(const std::string& token)
-{
-    if (!token.empty()) 
-    {
-        checkForAlphabets(token);
-        return std::stoi(token);
+int StringCalculator::handleWhitespaceAndConvert(const std::string& token) {
+    if (!token.empty()) {
+        detectAlphabetErrors(token);
+        int num = std::stoi(token);
+        return num;
     }
     return 0;
 }
 
-int StringCalculator::computeSumFromString(const std::string& input)
-{
-    std::string adjustedInput = adjustStringDelimiters(input);
-    int totalSum = 0;
-    std::stringstream ss(adjustedInput);
-    std::string token;
-    while (std::getline(ss, token, ','))
-    {
-        int number = handleTokenConversion(token);
-        totalSum += processNumber(number);
+std::string StringCalculator::replaceDelimiters(std::string input) {
+    if (input.substr(0, 2) == "//") {
+        char delimiter = input[2];
+        input = input.substr(4);
+        std::replace(input.begin(), input.end(), delimiter, ',');
     }
-    if (negativeFlag > 0)
-        handleNegativeNumbers();
-    return totalSum;
+    std::replace(input.begin(), input.end(), '\n', ',');
+    return input;
+}
+
+int StringCalculator::computeSumFromString(const std::string& input) {
+    std::string processedInput = replaceDelimiters(input);
+    int sum = 0;
+    std::stringstream ss(processedInput);
+    std::string token;
+    while (std::getline(ss, token, ',')) {
+        int num = handleWhitespaceAndConvert(token);
+        if (num < 0) {
+            negativeNumbers.push_back(num);
+            hasNegativeNumbers = true;
+        } else {
+            sum += limitToThousand(num);
+        }
+    }
+    validateNoNegatives();
+    return sum;
 }
