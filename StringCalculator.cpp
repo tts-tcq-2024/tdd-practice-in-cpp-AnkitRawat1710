@@ -2,7 +2,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <regex>
-#include <numeric>  // Add this line for std::accumulate
+#include <numeric> // Needed for std::accumulate
 
 // Helper method to extract delimiter; default is ",|\n"
 std::string StringCalculator::extractDelimiter(const std::string& input) {
@@ -13,34 +13,50 @@ std::string StringCalculator::extractDelimiter(const std::string& input) {
     return ",|\n";  // Default delimiters
 }
 
-// Helper method to parse numbers and handle exceptions
+// Helper method to split numbers using a delimiter
+std::vector<std::string> StringCalculator::splitNumbers(const std::string& input, const std::string& delimiter) {
+    std::regex delimiterRegex(delimiter);
+    std::sregex_token_iterator iter(input.begin(), input.end(), delimiterRegex, -1);
+    std::sregex_token_iterator end;
+    return {iter, end};
+}
+
+// Helper method to handle negative numbers
+void StringCalculator::checkForNegatives(const std::vector<int>& numbers) {
+    std::vector<int> negatives;
+    for (int num : numbers) {
+        if (num < 0) {
+            negatives.push_back(num);
+        }
+    }
+
+    if (!negatives.empty()) {
+        throw std::runtime_error("Negatives not allowed: " +
+            std::accumulate(negatives.begin(), negatives.end(), std::string(),
+                            [](const std::string& acc, int n) {
+                                return acc + (acc.empty() ? "" : ",") + std::to_string(n);
+                            }));
+    }
+}
+
+// Helper method to parse numbers from string input
 std::vector<int> StringCalculator::parseNumbers(const std::string& input) {
     std::string delimiter = extractDelimiter(input);
     std::string numbersPart = input.rfind("//", 0) == 0 ? input.substr(input.find('\n') + 1) : input;
 
-    std::regex delimiterRegex(delimiter);
-    std::sregex_token_iterator iter(numbersPart.begin(), numbersPart.end(), delimiterRegex, -1);
-    std::sregex_token_iterator end;
-
+    std::vector<std::string> tokens = splitNumbers(numbersPart, delimiter);
     std::vector<int> numbers;
-    std::vector<int> negatives;
 
-    for (; iter != end; ++iter) {
-        if (!iter->str().empty()) {
-            int num = std::stoi(iter->str());
-            if (num < 0) {
-                negatives.push_back(num);
-            } else if (num <= 1000) {
+    for (const std::string& token : tokens) {
+        if (!token.empty()) {
+            int num = std::stoi(token);
+            if (num <= 1000) {
                 numbers.push_back(num);
             }
         }
     }
 
-    if (!negatives.empty()) {
-        throw std::runtime_error("Negatives not allowed: " + std::accumulate(negatives.begin(), negatives.end(), std::string(),
-                         [](const std::string& acc, int n) { return acc + (acc.empty() ? "" : ",") + std::to_string(n); }));
-    }
-
+    checkForNegatives(numbers);
     return numbers;
 }
 
@@ -49,8 +65,5 @@ int StringCalculator::add(const std::string& input) {
     if (input.empty()) return 0;
 
     std::vector<int> numbers = parseNumbers(input);
-    int sum = 0;
-    for (int num : numbers) sum += num;
-
-    return sum;
+    return std::accumulate(numbers.begin(), numbers.end(), 0);
 }
