@@ -51,7 +51,7 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& input) {
 
     std::vector<std::string> tokens = splitNumbers(numbersPart, delimiter);
     std::vector<int> numbers;
-    
+
     for (const std::string& token : tokens) {
         if (!token.empty()) {
             int num = std::stoi(token);
@@ -60,7 +60,7 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& input) {
             }
         }
     }
-    
+
     std::vector<int> negatives = collectNegatives(numbers);
     handleNegatives(negatives);
 
