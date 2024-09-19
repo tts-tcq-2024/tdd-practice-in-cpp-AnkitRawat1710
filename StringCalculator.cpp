@@ -1,92 +1,52 @@
+// StringCalculator.cpp
+
 #include "StringCalculator.h"
+#include <stdexcept>
 #include <sstream>
-#include <iostream>
-#include <cctype>
-#include <algorithm>
+#include <regex>
 
-
-namespace {
-    std::vector<int> negativeNumbers;
-    bool hasNegatives = false;
-
-    class CustomException : public std::runtime_error {
-    public:
-        CustomException(const std::string& message)
-            : std::runtime_error(message) {}
-    };
-
-    void checkForAlphabet(const std::string& token) {
-        for (char ch : token) {
-            if (std::isalpha(ch)) {
-                throw CustomException("Alphabets are not allowed: " + token);
-            }
-        }
-    }
-
-    void validateNegatives() {
-        if (negativeNumbers.empty()) {
-            return;
-        }
-
-        std::string message = "Negatives are not allowed: ";
-        message += joinNegativeNumbers();
-        throw CustomException(message);
-    }
-
-    std::string joinNegativeNumbers() {
-        std::string result;
-        for (size_t i = 0; i < negativeNumbers.size(); ++i) {
-            if (i > 0) {
-                result += ", ";
-            }
-            result += std::to_string(negativeNumbers[i]);
-        }
-        return result;
-    }
-}
-
-int StringCalculator::checkIfLessThanThousand(int num) {
-    return (num >= 1000) ? 0 : num;
-}
-
-int StringCalculator::validateNonNegative(int num) {
-    if (num < 0) {
-        negativeNumbers.push_back(num);
+int StringCalculator::add(const std::string& numbers) {
+    if (numbers.empty()) {
         return 0;
     }
-    return checkIfLessThanThousand(num);
-}
 
-std::string StringCalculator::adjustDelimiters(std::string input) {
-    if (input.rfind("//", 0) == 0) {
-        char customDelimiter = input[2];
-        input = input.substr(4);
-        std::replace(input.begin(), input.end(), customDelimiter, ',');
-    }
-    std::replace(input.begin(), input.end(), '\n', ',');
-    return input;
-}
-
-int StringCalculator::handleWhitespace(std::string token) {
-    if (!token.empty()) {
-        checkForAlphabet(token);
-        return std::stoi(token);
-    }
-    return 0;
-}
-
-int StringCalculator::add(std::string input) {
-    std::string adjustedInput = adjustDelimiters(input);
-    int total = 0;
-    std::stringstream ss(adjustedInput);
-    std::string token;
-
-    while (std::getline(ss, token, ',')) {
-        int number = handleWhitespace(token);
-        total += validateNonNegative(number);
+    // Extract numbers based on the delimiter
+    std::vector<int> extractedNumbers = extractNumbers(numbers, ",");
+    
+    // Sum the extracted numbers
+    int sum = 0;
+    for (int num : extractedNumbers) {
+        if (num < 0) {
+            throw std::runtime_error("negatives not allowed");
+        }
+        if (num <= 1000) {
+            sum += num;
+        }
     }
 
-    validateNegatives();
-    return total;
+    return sum;
 }
 
+std::vector<int> StringCalculator::extractNumbers(const std::string& numbers, const std::string& delimiter) {
+    std::regex regex("\\d+");
+    std::smatch match;
+    std::vector<int> extractedNumbers;
+
+    std::string numbersCopy = numbers;
+    std::string::size_type pos = 0;
+    while ((pos = numbersCopy.find(delimiter)) != std::string::npos) {
+        std::string token = numbersCopy.substr(0, pos);
+        while (std::regex_search(token, match, regex)) {
+            extractedNumbers.push_back(std::stoi(match.str()));
+            token = match.suffix().str();
+        }
+        numbersCopy.erase(0, pos + delimiter.length());
+    }
+
+    while (std::regex_search(numbersCopy, match, regex)) {
+        extractedNumbers.push_back(std::stoi(match.str()));
+        numbersCopy = match.suffix().str();
+    }
+
+    return extractedNumbers;
+}
