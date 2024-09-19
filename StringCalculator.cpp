@@ -40,9 +40,10 @@ int StringCalculator::sumNumbers(const std::vector<int>& numbers) {
 
 int StringCalculator::add(const std::string& numbers) {
     char delimiter = ',';
-    if (numbers.starts_with("//")) {
+    if (numbers.find("//") == 0) {
         delimiter = numbers[2];
-        numbers = numbers.substr(4);
+        std::string temp = numbers.substr(4); // Create a non-const copy
+        numbers = temp;
     }
 
     std::vector<int> parsedNumbers = parseNumbers(numbers, delimiter);
