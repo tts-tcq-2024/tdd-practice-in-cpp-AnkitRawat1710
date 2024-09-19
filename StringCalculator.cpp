@@ -1,52 +1,51 @@
-// StringCalculator.cpp
-
 #include "StringCalculator.h"
 #include <stdexcept>
 #include <sstream>
-#include <regex>
 
-int StringCalculator::add(const std::string& numbers) {
-    if (numbers.empty()) {
-        return 0;
+std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, const char delimiter) {
+    std::vector<int> parsedNumbers;
+    std::istringstream iss(numbers);
+    std::string token;
+
+    while (std::getline(iss, token, delimiter)) {
+        int number = std::stoi(token);
+        if (number <= 1000) {
+            parsedNumbers.push_back(number);
+        }
     }
 
-    // Extract numbers based on the delimiter
-    std::vector<int> extractedNumbers = extractNumbers(numbers, ",");
-    
-    // Sum the extracted numbers
+    return parsedNumbers;
+}
+
+void StringCalculator::validateNumbers(const std::vector<int>& numbers) {
+    std::string negativeNumbers;
+    for (int number : numbers) {
+        if (number < 0) {
+            negativeNumbers += std::to_string(number) + ",";
+        }
+    }
+
+    if (!negativeNumbers.empty()) {
+        throw std::runtime_error("Negatives not allowed: " + negativeNumbers.substr(0, negativeNumbers.length() - 1));
+    }
+}
+
+int StringCalculator::sumNumbers(const std::vector<int>& numbers) {
     int sum = 0;
-    for (int num : extractedNumbers) {
-        if (num < 0) {
-            throw std::runtime_error("negatives not allowed");
-        }
-        if (num <= 1000) {
-            sum += num;
-        }
+    for (int number : numbers) {
+        sum += number;
     }
-
     return sum;
 }
 
-std::vector<int> StringCalculator::extractNumbers(const std::string& numbers, const std::string& delimiter) {
-    std::regex regex("\\d+");
-    std::smatch match;
-    std::vector<int> extractedNumbers;
-
-    std::string numbersCopy = numbers;
-    std::string::size_type pos = 0;
-    while ((pos = numbersCopy.find(delimiter)) != std::string::npos) {
-        std::string token = numbersCopy.substr(0, pos);
-        while (std::regex_search(token, match, regex)) {
-            extractedNumbers.push_back(std::stoi(match.str()));
-            token = match.suffix().str();
-        }
-        numbersCopy.erase(0, pos + delimiter.length());
+int StringCalculator::add(const std::string& numbers) {
+    char delimiter = ',';
+    if (numbers.starts_with("//")) {
+        delimiter = numbers[2];
+        numbers = numbers.substr(4);
     }
 
-    while (std::regex_search(numbersCopy, match, regex)) {
-        extractedNumbers.push_back(std::stoi(match.str()));
-        numbersCopy = match.suffix().str();
-    }
-
-    return extractedNumbers;
+    std::vector<int> parsedNumbers = parseNumbers(numbers, delimiter);
+    validateNumbers(parsedNumbers);
+    return sumNumbers(parsedNumbers);
 }
