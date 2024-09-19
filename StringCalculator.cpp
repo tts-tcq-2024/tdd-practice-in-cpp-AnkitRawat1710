@@ -6,12 +6,10 @@
 
 // Adds up numbers from the input string
 int StringCalculator::add(const std::string& numbers) {
-    // Check if the input is empty
     if (numbers.empty()) {
         return 0;
     }
 
-    // Initialize delimiter and input
     std::string delimiter = ",|\n";
     std::string input = numbers;
 
@@ -21,18 +19,15 @@ int StringCalculator::add(const std::string& numbers) {
         input = getNumberString(numbers);
     }
 
-    // Parse numbers and validate them
     std::vector<int> nums = parseNumbers(input, delimiter);
     validateNumbers(nums);
 
-    // Filter out numbers greater than 1000
     nums = filterLargeNumbers(nums);
 
-    // Sum up the remaining numbers
     return sumNumbers(nums);
 }
 
-// Extracts the custom delimiter from the input string
+// Get custom delimiter from input
 std::string StringCalculator::getCustomDelimiter(const std::string& input) {
     std::regex customDelimRegex("//(\\[.*?\\])+\n");
     std::smatch match;
@@ -46,17 +41,17 @@ std::string StringCalculator::getCustomDelimiter(const std::string& input) {
     return input.substr(2, input.find("\n") - 2);
 }
 
-// Extracts the part of the string containing numbers
+// Extract the part of the string with numbers, excluding the delimiter line
 std::string StringCalculator::getNumberString(const std::string& input) {
     return input.substr(input.find("\n") + 1);
 }
 
-// Converts a string to an integer
+// Converts string to an integer
 int StringCalculator::toInt(const std::string& number) {
     return std::stoi(number);
 }
 
-// Parses the input string into a vector of integers
+// Parses input string into vector of integers
 std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, const std::string& delimiter) {
     std::vector<int> result;
     std::regex delimRegex(delimiter);
@@ -72,7 +67,7 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, cons
     return result;
 }
 
-// Validates the numbers and throws an exception if any are negative
+// Validates numbers and checks for negatives
 void StringCalculator::validateNumbers(const std::vector<int>& numbers) {
     std::vector<int> negatives;
     for (int num : numbers) {
@@ -95,7 +90,7 @@ std::string StringCalculator::negativesToString(const std::vector<int>& negative
     return errorMsg;
 }
 
-// Sums up the numbers in a vector
+// Sums up numbers
 int StringCalculator::sumNumbers(const std::vector<int>& numbers) {
     return std::accumulate(numbers.begin(), numbers.end(), 0);
 }
