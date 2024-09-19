@@ -1,5 +1,3 @@
-// StringCalculator.h
-
 #ifndef STRINGCALCULATOR_H
 #define STRINGCALCULATOR_H
 
@@ -11,7 +9,9 @@ public:
     int add(const std::string& numbers);
 
 private:
-    std::vector<int> extractNumbers(const std::string& numbers, const std::string& delimiter);
+    std::vector<int> parseNumbers(const std::string& numbers, const char delimiter);
+    void validateNumbers(const std::vector<int>& numbers);
+    int sumNumbers(const std::vector<int>& numbers);
 };
 
 #endif
