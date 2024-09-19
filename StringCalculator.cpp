@@ -7,9 +7,10 @@
 // Adds up numbers from the input string
 int StringCalculator::add(const std::string& numbers) {
     if (numbers.empty()) return 0;
-    
+
     std::string delimiter = ",|\n";
     std::string input = numbers;
+
     // Handle custom delimiters
     if (numbers.substr(0, 2) == "//") {
         delimiter = getCustomDelimiter(numbers);
@@ -18,7 +19,9 @@ int StringCalculator::add(const std::string& numbers) {
 
     std::vector<int> nums = parseNumbers(input, delimiter);
     validateNumbers(nums);
+
     nums = filterLargeNumbers(nums);
+
     return sumNumbers(nums);
 }
 
@@ -52,6 +55,7 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, cons
     std::regex delimRegex(delimiter);
     std::sregex_token_iterator iter(numbers.begin(), numbers.end(), delimRegex, -1);
     std::sregex_token_iterator end;
+
     while (iter != end) {
         std::string token = *iter++;
         if (!token.empty()) {
