@@ -6,8 +6,12 @@
 
 // Adds up numbers from the input string
 int StringCalculator::add(const std::string& numbers) {
-    if (numbers.empty()) return 0;
+    // Check if the input is empty
+    if (numbers.empty()) {
+        return 0;
+    }
 
+    // Initialize delimiter and input
     std::string delimiter = ",|\n";
     std::string input = numbers;
 
@@ -17,15 +21,18 @@ int StringCalculator::add(const std::string& numbers) {
         input = getNumberString(numbers);
     }
 
+    // Parse numbers and validate them
     std::vector<int> nums = parseNumbers(input, delimiter);
     validateNumbers(nums);
 
+    // Filter out numbers greater than 1000
     nums = filterLargeNumbers(nums);
 
+    // Sum up the remaining numbers
     return sumNumbers(nums);
 }
 
-// Get custom delimiter from input
+// Extracts the custom delimiter from the input string
 std::string StringCalculator::getCustomDelimiter(const std::string& input) {
     std::regex customDelimRegex("//(\\[.*?\\])+\n");
     std::smatch match;
@@ -39,17 +46,17 @@ std::string StringCalculator::getCustomDelimiter(const std::string& input) {
     return input.substr(2, input.find("\n") - 2);
 }
 
-// Extract the part of the string with numbers, excluding the delimiter line
+// Extracts the part of the string containing numbers
 std::string StringCalculator::getNumberString(const std::string& input) {
     return input.substr(input.find("\n") + 1);
 }
 
-// Converts string to an integer
+// Converts a string to an integer
 int StringCalculator::toInt(const std::string& number) {
     return std::stoi(number);
 }
 
-// Parses input string into vector of integers
+// Parses the input string into a vector of integers
 std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, const std::string& delimiter) {
     std::vector<int> result;
     std::regex delimRegex(delimiter);
@@ -65,35 +72,30 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, cons
     return result;
 }
 
-// Validates numbers and checks for negatives
+// Validates the numbers and throws an exception if any are negative
 void StringCalculator::validateNumbers(const std::vector<int>& numbers) {
-    std::vector<int> negatives = findNegativeNumbers(numbers);
-    throwIfNegatives(negatives);
-}
-
-// Finds all negative numbers in the list
-std::vector<int> StringCalculator::findNegativeNumbers(const std::vector<int>& numbers) {
     std::vector<int> negatives;
     for (int num : numbers) {
         if (num < 0) {
             negatives.push_back(num);
         }
     }
-    return negatives;
-}
 
-// Throws an exception if there are negative numbers
-void StringCalculator::throwIfNegatives(const std::vector<int>& negatives) {
     if (!negatives.empty()) {
-        std::string errorMsg = "negatives not allowed: ";
-        for (int neg : negatives) {
-            errorMsg += std::to_string(neg) + " ";
-        }
-        throw std::runtime_error(errorMsg);
+        throw std::runtime_error("negatives not allowed: " + negativesToString(negatives));
     }
 }
 
-// Sums up numbers
+// Converts a vector of negatives to a string
+std::string StringCalculator::negativesToString(const std::vector<int>& negatives) {
+    std::string errorMsg = "negatives not allowed: ";
+    for (int neg : negatives) {
+        errorMsg += std::to_string(neg) + " ";
+    }
+    return errorMsg;
+}
+
+// Sums up the numbers in a vector
 int StringCalculator::sumNumbers(const std::vector<int>& numbers) {
     return std::accumulate(numbers.begin(), numbers.end(), 0);
 }
