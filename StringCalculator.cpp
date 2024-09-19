@@ -4,6 +4,7 @@
 #include <cctype>
 #include <algorithm>
 
+
 namespace {
     std::vector<int> negativeNumbers;
     bool hasNegatives = false;
