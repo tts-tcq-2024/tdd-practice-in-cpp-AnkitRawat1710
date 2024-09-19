@@ -6,13 +6,10 @@
 
 // Adds up numbers from the input string
 int StringCalculator::add(const std::string& numbers) {
-    if (numbers.empty()) {
-        return 0;
-    }
-
+    if (numbers.empty()) return 0;
+    
     std::string delimiter = ",|\n";
     std::string input = numbers;
-
     // Handle custom delimiters
     if (numbers.substr(0, 2) == "//") {
         delimiter = getCustomDelimiter(numbers);
@@ -21,9 +18,7 @@ int StringCalculator::add(const std::string& numbers) {
 
     std::vector<int> nums = parseNumbers(input, delimiter);
     validateNumbers(nums);
-
     nums = filterLargeNumbers(nums);
-
     return sumNumbers(nums);
 }
 
@@ -57,7 +52,6 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, cons
     std::regex delimRegex(delimiter);
     std::sregex_token_iterator iter(numbers.begin(), numbers.end(), delimRegex, -1);
     std::sregex_token_iterator end;
-
     while (iter != end) {
         std::string token = *iter++;
         if (!token.empty()) {
@@ -69,25 +63,30 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, cons
 
 // Validates numbers and checks for negatives
 void StringCalculator::validateNumbers(const std::vector<int>& numbers) {
+    std::vector<int> negatives = findNegativeNumbers(numbers);
+    throwIfNegatives(negatives);
+}
+
+// Finds all negative numbers in the list
+std::vector<int> StringCalculator::findNegativeNumbers(const std::vector<int>& numbers) {
     std::vector<int> negatives;
     for (int num : numbers) {
         if (num < 0) {
             negatives.push_back(num);
         }
     }
-
-    if (!negatives.empty()) {
-        throw std::runtime_error("negatives not allowed: " + negativesToString(negatives));
-    }
+    return negatives;
 }
 
-// Converts a vector of negatives to a string
-std::string StringCalculator::negativesToString(const std::vector<int>& negatives) {
-    std::string errorMsg = "negatives not allowed: ";
-    for (int neg : negatives) {
-        errorMsg += std::to_string(neg) + " ";
+// Throws an exception if there are negative numbers
+void StringCalculator::throwIfNegatives(const std::vector<int>& negatives) {
+    if (!negatives.empty()) {
+        std::string errorMsg = "negatives not allowed: ";
+        for (int neg : negatives) {
+            errorMsg += std::to_string(neg) + " ";
+        }
+        throw std::runtime_error(errorMsg);
     }
-    return errorMsg;
 }
 
 // Sums up numbers
