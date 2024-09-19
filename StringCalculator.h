@@ -1,17 +1,17 @@
+// StringCalculator.h
+
 #ifndef STRINGCALCULATOR_H
 #define STRINGCALCULATOR_H
 
 #include <string>
+#include <vector>
 
-class StringCalculator
-{
-  public:
-    int checkIfLessThanThousand(int num);
-    int validateNonNegative(int num);
+class StringCalculator {
+public:
+    int add(const std::string& numbers);
 
-    std::string adjustDelimiters(std::string input);
-    int handleWhitespace(std::string token);
-    int add(std::string input);
+private:
+    std::vector<int> extractNumbers(const std::string& numbers, const std::string& delimiter);
 };
 
-#endif // STRINGCALCULATOR_H
+#endif
