@@ -4,24 +4,21 @@
 #include <numeric>
 #include <regex>
 
-// Adds up numbers from the input string
+// Adds numbers from the input string
 int StringCalculator::add(const std::string& numbers) {
-    if (numbers.empty()) return 0;
-
+    if (numbers.empty()) 
+        return 0;
     std::string delimiter = ",|\n";
     std::string input = numbers;
-
+    
     // Handle custom delimiters
     if (numbers.substr(0, 2) == "//") {
         delimiter = getCustomDelimiter(numbers);
         input = getNumberString(numbers);
     }
-
     std::vector<int> nums = parseNumbers(input, delimiter);
     validateNumbers(nums);
-
     nums = filterLargeNumbers(nums);
-
     return sumNumbers(nums);
 }
 
