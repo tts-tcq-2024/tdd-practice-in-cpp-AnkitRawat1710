@@ -98,6 +98,6 @@ int StringCalculator::sumNumbers(const std::vector<int>& numbers) {
 // Filters out numbers greater than 1000
 std::vector<int> StringCalculator::filterLargeNumbers(const std::vector<int>& numbers) {
     std::vector<int> filtered;
-    //std::copy_if(numbers.begin(), numbers.end(), std::back_inserter(filtered), [](int n){ return n <= 1000; });
+    std::copy_if(numbers.begin(), numbers.end(), std::back_inserter(filtered), [](int n){ return n <= 1000; });
     return filtered;
 }
